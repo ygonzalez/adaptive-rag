@@ -58,6 +58,9 @@ backend/.chroma/
 *.sublime-project
 *.sublime-workspace
 
+# Claude
+.claude/
+
 # OS
 .DS_Store
 .DS_Store?
