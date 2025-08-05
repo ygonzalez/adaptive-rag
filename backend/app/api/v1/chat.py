@@ -20,14 +20,19 @@ async def chat(
     Process a chat request through the RAG system
     """
     try:
-        result = await chat_service.process_question(request.question, request.session_id)
+        # Run the chat service directly in the async context
+        # This avoids the event loop issue with ThreadPoolExecutor
+        result = chat_service.process_question(
+            request.question,
+            request.session_id
+        )
         return ChatResponse(**result)
     except Exception as e:
         logger.error(f"Error processing chat request: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/chat/sessions/{session_id}", response_model=Dict[str, Any])
-async def get_session(
+def get_session(
     session_id: str,
     chat_service: ChatService = Depends(get_chat_service)
 ):
@@ -35,7 +40,7 @@ async def get_session(
     Get chat session history
     """
     try:
-        history = await chat_service.get_session_history(session_id)
+        history = chat_service.get_session_history(session_id)
         return {"session_id": session_id, "history": history}
     except Exception as e:
         logger.error(f"Error retrieving session: {str(e)}")

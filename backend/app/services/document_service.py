@@ -3,6 +3,7 @@ import asyncio
 import logging
 import shutil
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 from app.core.ingestion.ingestion import ingest_urls, ingest_texts
 
@@ -11,6 +12,7 @@ logger = logging.getLogger(__name__)
 class DocumentService:
     def __init__(self):
         self.vectorstore_path = "./.chroma"
+        self.executor = ThreadPoolExecutor(max_workers=2)
     
     async def ingest_documents(
         self, 
@@ -23,14 +25,16 @@ class DocumentService:
         try:
             documents_processed = 0
             
+            loop = asyncio.get_event_loop()
+            
             if urls:
                 # Run URL ingestion in thread pool
-                await asyncio.to_thread(ingest_urls, urls)
+                await loop.run_in_executor(self.executor, ingest_urls, urls)
                 documents_processed += len(urls)
             
             if texts:
                 # Run text ingestion in thread pool
-                await asyncio.to_thread(ingest_texts, texts)
+                await loop.run_in_executor(self.executor, ingest_texts, texts)
                 documents_processed += len(texts)
             
             return {
@@ -53,7 +57,8 @@ class DocumentService:
         """
         try:
             if os.path.exists(self.vectorstore_path):
-                await asyncio.to_thread(shutil.rmtree, self.vectorstore_path)
+                loop = asyncio.get_event_loop()
+                await loop.run_in_executor(self.executor, shutil.rmtree, self.vectorstore_path)
                 logger.info("Vector store cleared successfully")
         except Exception as e:
             logger.error(f"Error clearing vector store: {str(e)}")

@@ -1,5 +1,4 @@
 from typing import Dict, Any, List, Optional
-import asyncio
 import logging
 from datetime import datetime
 
@@ -12,7 +11,7 @@ class ChatService:
     def __init__(self):
         self.sessions: Dict[str, List[Dict[str, Any]]] = {}
     
-    async def process_question(self, question: str, session_id: Optional[str] = None) -> Dict[str, Any]:
+    def process_question(self, question: str, session_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Process a question through the RAG graph
         """
@@ -25,11 +24,8 @@ class ChatService:
                 "documents": []
             }
             
-            # Run the graph asynchronously
-            result = await asyncio.to_thread(
-                graph_app.invoke,
-                initial_state
-            )
+            # Run the graph
+            result = graph_app.invoke(initial_state)
             
             # Extract source information
             sources = []
@@ -63,7 +59,7 @@ class ChatService:
             logger.error(f"Error in process_question: {str(e)}")
             raise
     
-    async def get_session_history(self, session_id: str) -> List[Dict[str, Any]]:
+    def get_session_history(self, session_id: str) -> List[Dict[str, Any]]:
         """
         Get chat history for a session
         """
