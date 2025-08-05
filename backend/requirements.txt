@@ -1,0 +1,38 @@
+# FastAPI and web framework
+fastapi==0.110.0
+uvicorn[standard]==0.27.1
+python-dotenv==1.0.0
+pydantic==2.6.1
+
+# LangChain and AI/ML
+langchain==0.1.9
+langchain-core==0.1.27
+langchain-community==0.0.24
+langchain-experimental==0.0.52
+langchain-google-genai==0.0.9
+langchain-chroma==0.1.0
+langchain-tavily==0.0.2
+langgraph==0.0.26
+
+# Vector database
+chromadb==0.4.22
+
+# Google AI
+google-generativeai==0.3.2
+
+# Utilities
+httpx==0.26.0
+tiktoken==0.5.2
+
+# Development and testing
+pytest==8.0.0
+pytest-asyncio==0.23.5
+pytest-cov==4.1.0
+black==24.2.0
+isort==5.13.2
+
+# Logging and monitoring (optional)
+structlog==24.1.0
+
+# Production server
+gunicorn==21.2.0
