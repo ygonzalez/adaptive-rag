@@ -10,7 +10,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import {
-  Psychology as BrainIcon,
+  LocalHospital as HealthIcon,
   GitHub as GitHubIcon,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
@@ -30,7 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children, darkMode, onToggleDarkMode })
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <AppBar position="static" elevation={1}>
         <Toolbar>
-          <BrainIcon sx={{ mr: 2 }} />
+          <HealthIcon sx={{ mr: 2 }} />
           <Typography
             variant="h6"
             component="div"
@@ -40,7 +40,7 @@ const Layout: React.FC<LayoutProps> = ({ children, darkMode, onToggleDarkMode })
               fontSize: isMobile ? '1rem' : '1.25rem'
             }}
           >
-            Adaptive RAG System
+            AI in Healthcare RAG
           </Typography>
 
           <IconButton
@@ -91,7 +91,7 @@ const Layout: React.FC<LayoutProps> = ({ children, darkMode, onToggleDarkMode })
             color="text.secondary"
             align="center"
           >
-            Powered by FastAPI + LangChain + LangGraph • Built with ❤️ and AI
+            AI Healthcare Research Assistant • Powered by FastAPI + LangChain + LangGraph
           </Typography>
         </Container>
       </Box>

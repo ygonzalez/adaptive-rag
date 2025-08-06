@@ -9,6 +9,7 @@ from langchain_community.document_loaders import WebBaseLoader
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from ..models.model import get_embedding_model
+from .healthcare_data import get_healthcare_urls
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -105,13 +106,9 @@ class DocumentIngestion:
 def create_vectorstore(urls: List[str] = None) -> DocumentIngestion:
     """Create and populate vectorstore with documents."""
 
-    # Default URLs if none provided
+    # Default URLs if none provided - AI in Healthcare focus
     if urls is None:
-        urls = [
-            "https://lilianweng.github.io/posts/2023-06-23-agent/",
-            "https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/",
-            "https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/",
-        ]
+        urls = get_healthcare_urls()
 
     # Create ingestion system
     ingestion = DocumentIngestion()

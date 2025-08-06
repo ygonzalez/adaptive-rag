@@ -8,15 +8,18 @@ const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [healthStatus, setHealthStatus] = useState<'loading' | 'healthy' | 'error'>('loading');
 
-  // Create theme based on dark mode preference
+  // Create healthcare-focused theme
   const theme = createTheme({
     palette: {
       mode: darkMode ? 'dark' : 'light',
       primary: {
-        main: '#1976d2',
+        main: '#2e7d32', // Medical green
       },
       secondary: {
-        main: '#dc004e',
+        main: '#1565c0', // Medical blue
+      },
+      info: {
+        main: '#0277bd', // Healthcare blue
       },
     },
     components: {

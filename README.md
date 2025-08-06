@@ -1,15 +1,17 @@
-# Adaptive RAG System
+# AI in Healthcare RAG System
 
-An intelligent Retrieval-Augmented Generation (RAG) system built with FastAPI, LangChain, and LangGraph that automatically adapts between document retrieval and web search based on query relevance.
+An intelligent Retrieval-Augmented Generation (RAG) system focused on AI in Healthcare, built with FastAPI, LangChain, and LangGraph. The system automatically adapts between document retrieval and web search to provide comprehensive answers about AI applications in medical imaging, clinical decision support, diagnostic AI, and healthcare ethics.
 
 ## 🚀 Features
 
+- **Healthcare AI Focus**: Specialized knowledge base covering medical imaging, clinical AI, diagnostic systems, and healthcare ethics
 - **Adaptive Question Routing**: Automatically determines whether to use document retrieval or web search
-- **Multi-Stage Validation**: Includes hallucination detection and answer quality grading
-- **Semantic Document Chunking**: Uses semantic similarity for intelligent text splitting
+- **Multi-Stage Validation**: Includes hallucination detection and answer quality grading for medical accuracy
+- **Semantic Document Chunking**: Uses semantic similarity for intelligent text splitting of medical literature
+- **Current Healthcare Developments**: Web search integration for latest FDA approvals, clinical trials, and industry news
 - **FastAPI Backend**: RESTful API with automatic OpenAPI documentation
-- **Interactive CLI**: Command-line interface for direct interaction
-- **Comprehensive Testing**: Full test suite with unit and integration tests
+- **Interactive CLI**: Command-line interface for direct healthcare AI queries
+- **Comprehensive Testing**: Full test suite with healthcare-specific test cases
 - **Docker Support**: Containerized deployment ready
 
 ## 🏗️ Architecture
@@ -104,15 +106,19 @@ python cli.py
 ### Example API Usage
 
 ```bash
-# Chat request
+# Healthcare AI queries
 curl -X POST "http://localhost:8000/api/v1/chat" \
   -H "Content-Type: application/json" \
-  -d '{"question": "What are adversarial attacks in LLMs?"}'
+  -d '{"question": "How does AI improve medical image analysis?"}'
 
-# Ingest documents
+curl -X POST "http://localhost:8000/api/v1/chat" \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What are the latest FDA approvals for AI medical devices?"}'
+
+# Ingest healthcare documents
 curl -X POST "http://localhost:8000/api/v1/documents/ingest" \
   -H "Content-Type: application/json" \
-  -d '{"texts": ["Your document content here"]}'
+  -d '{"texts": ["Clinical AI research content here"]}'
 ```
 
 ## 🧪 Testing
@@ -184,12 +190,33 @@ adaptive_rag/
 - `HOST`: Server host (default: 0.0.0.0)
 - `PORT`: Server port (default: 8000)
 
-### Default Document Sources
+### Default Healthcare AI Data Sources
 
-The system comes pre-configured with documents from Lilian Weng's blog:
-- Agent architectures
-- Prompt engineering techniques  
-- Adversarial attacks on LLMs
+The system comes pre-configured with curated healthcare AI literature from:
+
+**Medical Imaging AI:**
+- Nature Medicine articles on deep learning in medical imaging
+- Research on AI in dermatology and retinal imaging
+- Medical imaging overview and analysis techniques
+
+**Clinical AI Systems:**
+- NCBI PMC articles on AI in clinical decision making
+- Machine learning applications in intensive care
+- AI systems for emergency medicine
+
+**Diagnostic AI:**
+- Research on AI in diagnostic imaging and pathology
+- Laboratory diagnostics and AI integration
+- Validation methods for diagnostic AI systems
+
+**Predictive Analytics:**
+- Healthcare predictive models and early detection systems
+- Patient monitoring and deterioration prediction
+
+**AI Ethics & Validation:**
+- Bias and fairness in healthcare AI
+- Explainable AI in medical applications
+- Regulatory guidelines and compliance
 
 ## 🤝 Contributing
 
@@ -211,17 +238,41 @@ This project is open source and available under the [MIT License](LICENSE).
 - [LangGraph Documentation](https://langchain-ai.github.io/langgraph/)
 - [Google Gemini API](https://ai.google.dev/)
 
-## 💡 Use Cases
+## 💡 Healthcare AI Use Cases
 
-- **Research Assistance**: Get answers from specific document collections
-- **Customer Support**: Query knowledge bases with web search fallback
-- **Content Analysis**: Analyze documents with intelligent chunking
-- **Educational Tools**: Interactive learning with validated responses
+- **Medical Research**: Query latest research on AI applications in healthcare
+- **Clinical Decision Support**: Get evidence-based answers about AI diagnostic tools
+- **Regulatory Compliance**: Access current FDA guidelines and approval processes
+- **Educational Resources**: Learn about healthcare AI implementations and best practices
+- **Technology Assessment**: Compare different AI solutions for medical applications
+- **Ethics and Safety**: Understand bias, fairness, and validation requirements
+
+### Sample Questions the System Can Answer:
+
+**Medical Imaging:**
+- "How does deep learning improve medical image analysis?"
+- "What are the challenges of AI in radiology?"
+- "How accurate is AI for detecting skin cancer in dermoscopy images?"
+
+**Clinical Applications:**
+- "How do AI systems assist in clinical decision making?"
+- "What role does machine learning play in intensive care units?"
+- "How can AI improve emergency department triage?"
+
+**Current Developments:**
+- "Latest FDA approvals for AI medical devices 2024"
+- "Recent breakthroughs in AI medical imaging"
+- "New regulations for AI medical devices"
+
+**Complex Queries:**
+- "What AI imaging technologies are currently in FDA clinical trials?"
+- "How are current AI ethics guidelines affecting diagnostic AI development?"
 
 ## 🎯 Future Enhancements
 
-- Multi-modal document support (PDFs, images)
-- Custom model integration
-- Advanced caching strategies
-- Real-time collaboration features
-- Analytics and usage tracking
+- Integration with medical databases (PubMed, ClinicalTrials.gov)
+- Multi-modal support for medical images and DICOM files
+- Real-time regulatory updates and notifications
+- Specialized medical terminology processing
+- Integration with clinical workflow systems
+- Advanced medical literature analysis

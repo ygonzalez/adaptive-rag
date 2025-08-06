@@ -129,11 +129,11 @@ const ChatInterface: React.FC = () => {
       {/* Header */}
       <Paper sx={{ p: 2, mb: 2 }}>
         <Typography variant="h5" gutterBottom>
-          Adaptive RAG System
+          AI in Healthcare Research Assistant
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Ask questions about AI, agents, prompt engineering, or anything else.
-          The system will intelligently route to documents or web search.
+          Ask questions about AI applications in healthcare, medical imaging, clinical decision support, 
+          diagnostic AI, and current developments. The system intelligently routes to medical literature or web search.
         </Typography>
         
         {/* Tabs */}
@@ -174,11 +174,33 @@ const ChatInterface: React.FC = () => {
                     }}
                   >
                     <Typography variant="h6" color="text.secondary">
-                      Start a conversation!
+                      Explore AI in Healthcare!
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" align="center">
-                      Try asking: "What is agent memory?" or "How to make pizza?"
-                    </Typography>
+                    <Box sx={{ maxWidth: '600px', textAlign: 'center' }}>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Sample questions to get you started:
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
+                        {[
+                          "How does AI improve medical image analysis?",
+                          "What are the challenges of AI in radiology?", 
+                          "How do AI systems assist in clinical decision making?",
+                          "Latest FDA approvals for AI medical devices 2024",
+                          "How accurate is AI for detecting skin cancer?"
+                        ].map((question, index) => (
+                          <Chip
+                            key={index}
+                            label={question}
+                            variant="outlined"
+                            onClick={() => setInputValue(question)}
+                            sx={{ 
+                              cursor: 'pointer',
+                              '&:hover': { bgcolor: 'action.hover' }
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    </Box>
                   </Box>
                 )}
 
@@ -335,7 +357,7 @@ const ChatInterface: React.FC = () => {
                   fullWidth
                   multiline
                   maxRows={4}
-                  placeholder="Ask me anything..."
+                  placeholder="Ask about AI in healthcare, medical imaging, clinical AI, diagnostics..."
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
