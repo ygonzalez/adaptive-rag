@@ -1,17 +1,40 @@
-version: '3.8'
-
+# Backend Services - PostgreSQL + API
 services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: adaptive_rag_postgres
+    environment:
+      POSTGRES_DB: adaptive_rag_db
+      POSTGRES_USER: yvettegonzalez
+      POSTGRES_PASSWORD: lisi2013
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yvettegonzalez -d adaptive_rag_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   api:
     build: .
+    container_name: adaptive_rag_api
+    env_file:
+      - .env.docker
     ports:
       - "8000:8000"
-    environment:
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - TAVILY_API_KEY=${TAVILY_API_KEY}
-      - HOST=0.0.0.0
-      - PORT=8000
-      - LOG_LEVEL=INFO
     volumes:
-      - ./app:/app/app  # Mount app directory for development
-      - ./.chroma:/app/.chroma  # Persist vector store
+      - .:/app
+      # Share ChromaDB directory between local and Docker
+      - ./.chroma:/app/.chroma
+    depends_on:
+      postgres:
+        condition: service_healthy
     command: python run.py
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local

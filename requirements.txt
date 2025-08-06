@@ -1,6 +1,7 @@
 beautifulsoup4
 langchain-community
 langchain_experimental
+langchain-core==0.3.25
 tiktoken
 langchainhub
 langchain

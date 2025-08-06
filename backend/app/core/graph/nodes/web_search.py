@@ -19,6 +19,7 @@ def web_search(state: GraphState) -> Dict[str, Any]:
     print("---WEB SEARCH---")
     question = state["question"]
     documents = state.get("documents", [])
+    web_search_attempts = state.get("web_search_attempts", 0)
 
     try:
         # Ensure we have an event loop for async operations
@@ -51,7 +52,11 @@ def web_search(state: GraphState) -> Dict[str, Any]:
         else:
             documents = [web_results]
 
-        return {"documents": documents, "question": question}
+        return {
+            "documents": documents, 
+            "question": question,
+            "web_search_attempts": web_search_attempts + 1
+        }
 
     except Exception as e:
         print(f"Error in web search: {e}")
@@ -64,7 +69,11 @@ def web_search(state: GraphState) -> Dict[str, Any]:
         else:
             documents = [fallback_doc]
         
-        return {"documents": documents, "question": question}
+        return {
+            "documents": documents, 
+            "question": question,
+            "web_search_attempts": web_search_attempts + 1
+        }
 
 if __name__ == "__main__":
     web_search(state={"question": "agent memory", "documents": None})

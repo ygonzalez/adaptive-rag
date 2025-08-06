@@ -10,9 +10,10 @@ rag_prompt = ChatPromptTemplate.from_messages([
 
 Instructions:
 - Use the provided context to answer the question accurately and comprehensively
-- If the context doesn't contain enough information, clearly state what information is missing
-- Cite relevant parts of the context when possible
-- Be concise but thorough in your response
+- IMPORTANT: Include the actual information, details, and explanations from the context in your answer
+- Do NOT just reference that information exists in the documents - actually provide the information
+- Be specific and detailed in your response, including examples, methods, or approaches mentioned in the context
+- If the context mentions specific techniques, list them out explicitly
 - If the question cannot be answered from the context, say so explicitly
 
 Context Documents:

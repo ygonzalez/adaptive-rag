@@ -30,7 +30,17 @@ def grade_generation_grounded_in_documents_and_question(state: GraphState) -> st
     question = state["question"]
     documents = state["documents"]
     generation = state["generation"]
-
+    generation_attempts = state.get("generation_attempts", 0)
+    web_search_attempts = state.get("web_search_attempts", 0)
+    
+    # Check if we've hit max retries
+    MAX_GENERATION_ATTEMPTS = 3
+    MAX_WEB_SEARCH_ATTEMPTS = 2
+    
+    if generation_attempts >= MAX_GENERATION_ATTEMPTS:
+        print(f"---MAX GENERATION ATTEMPTS ({MAX_GENERATION_ATTEMPTS}) REACHED, ENDING---")
+        return "max_retries"
+    
     score = hallucination_grader.invoke(
         {"documents": documents, "generation": generation}
     )
@@ -44,6 +54,9 @@ def grade_generation_grounded_in_documents_and_question(state: GraphState) -> st
             return "useful"
         else:
             print("---DECISION: GENERATION DOES NOT ADDRESS QUESTION---")
+            if web_search_attempts >= MAX_WEB_SEARCH_ATTEMPTS:
+                print(f"---MAX WEB SEARCH ATTEMPTS ({MAX_WEB_SEARCH_ATTEMPTS}) REACHED, ENDING---")
+                return "max_retries"
             return "not useful"
     else:
         print("---DECISION: GENERATION IS NOT GROUNDED IN DOCUMENTS, RE-TRY---")
@@ -107,11 +120,15 @@ workflow.add_conditional_edges(
         "not supported": GENERATE,
         "useful": END,
         "not useful": WEBSEARCH,
+        "max_retries": END,
     },
 )
 workflow.add_edge(WEBSEARCH, GENERATE)
 workflow.add_edge(GENERATE, END)
 
 app = workflow.compile()
+
+# Set recursion limit to prevent infinite loops
+app.recursion_limit = 15
 
 app.get_graph().draw_mermaid_png(output_file_path="graph.png")

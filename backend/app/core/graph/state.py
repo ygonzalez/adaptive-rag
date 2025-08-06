@@ -12,9 +12,13 @@ class GraphState(TypedDict):
         generation: LLM generation
         web_search: whether to add search
         documents: list of documents
+        generation_attempts: number of generation attempts
+        web_search_attempts: number of web search attempts
     """
 
     question: str
     generation: str
     web_search: bool
     documents: List[str]
+    generation_attempts: int
+    web_search_attempts: int
