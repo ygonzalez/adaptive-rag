@@ -15,6 +15,9 @@ import {
   ListItem,
   ListItemText,
   useTheme,
+  Tabs,
+  Tab,
+  Container,
 } from '@mui/material';
 import {
   Send as SendIcon,
@@ -27,6 +30,21 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { ChatMessage, AppState } from '@/types/api';
 import { apiService } from '@/services/api';
+import { ProcessVisualization } from '../ProcessVisualization';
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
+  return (
+    <div role="tabpanel" hidden={value !== index} style={{ height: '100%' }}>
+      {value === index && <Box sx={{ p: 0, height: '100%' }}>{children}</Box>}
+    </div>
+  );
+};
 
 const ChatInterface: React.FC = () => {
   const theme = useTheme();
@@ -37,6 +55,8 @@ const ChatInterface: React.FC = () => {
     sessionId: `session-${Date.now()}`,
   });
   const [inputValue, setInputValue] = useState('');
+  const [currentTab, setCurrentTab] = useState(0);
+  const [visualizationEnabled, setVisualizationEnabled] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -105,68 +125,83 @@ const ChatInterface: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '70vh' }}>
+    <Container maxWidth="xl" sx={{ py: 2, height: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <Paper sx={{ p: 2, mb: 2 }}>
         <Typography variant="h5" gutterBottom>
-          Chat with RAG System
+          Adaptive RAG System
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Ask questions about AI, agents, prompt engineering, or anything else.
           The system will intelligently route to documents or web search.
         </Typography>
+        
+        {/* Tabs */}
+        <Tabs 
+          value={currentTab} 
+          onChange={(_, newValue) => setCurrentTab(newValue)}
+          sx={{ mt: 2 }}
+        >
+          <Tab label="Chat" />
+          <Tab label="Process Visualization" />
+        </Tabs>
       </Paper>
 
-      {/* Messages Area */}
-      <Paper
-        sx={{
-          flex: 1,
-          overflow: 'auto',
-          p: 1,
-          bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
-        }}
-      >
-        <Box sx={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
-          {state.messages.length === 0 && (
-            <Box
+      <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+        {/* Tab Content */}
+        <TabPanel value={currentTab} index={0}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 280px)' }}>
+            {/* Messages Area */}
+            <Paper
               sx={{
                 flex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                gap: 2,
-              }}
-            >
-              <Typography variant="h6" color="text.secondary">
-                Start a conversation!
-              </Typography>
-              <Typography variant="body2" color="text.secondary" align="center">
-                Try asking: "What is agent memory?" or "How to make pizza?"
-              </Typography>
-            </Box>
-          )}
-
-          {state.messages.map((message) => (
-            <Box
-              key={message.id}
-              sx={{
-                display: 'flex',
-                flexDirection: message.type === 'user' ? 'row-reverse' : 'row',
+                overflow: 'auto',
+                p: 1,
+                bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
                 mb: 2,
-                alignItems: 'flex-start',
               }}
             >
-              <Box
-                sx={{
-                  bgcolor: message.type === 'user' ? 'primary.main' : 'background.paper',
-                  color: message.type === 'user' ? 'primary.contrastText' : 'text.primary',
-                  maxWidth: '70%',
-                  borderRadius: 2,
-                  p: 2,
-                  boxShadow: 1,
-                }}
-              >
+              <Box sx={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
+                {state.messages.length === 0 && (
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexDirection: 'column',
+                      gap: 2,
+                    }}
+                  >
+                    <Typography variant="h6" color="text.secondary">
+                      Start a conversation!
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" align="center">
+                      Try asking: "What is agent memory?" or "How to make pizza?"
+                    </Typography>
+                  </Box>
+                )}
+
+                {state.messages.map((message) => (
+                  <Box
+                    key={message.id}
+                    sx={{
+                      display: 'flex',
+                      flexDirection: message.type === 'user' ? 'row-reverse' : 'row',
+                      mb: 2,
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        bgcolor: message.type === 'user' ? 'primary.main' : 'background.paper',
+                        color: message.type === 'user' ? 'primary.contrastText' : 'text.primary',
+                        maxWidth: '70%',
+                        borderRadius: 2,
+                        p: 2,
+                        boxShadow: 1,
+                      }}
+                    >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                   {message.type === 'user' ? (
                     <PersonIcon sx={{ mr: 1, fontSize: '1rem' }} />
@@ -262,63 +297,77 @@ const ChatInterface: React.FC = () => {
                         </CardContent>
                       </Card>
                     )}
+                      </Box>
+                    )}
+                    </Box>
+                  </Box>
+                ))}
+
+                {/* Loading indicator */}
+                {state.isLoading && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
+                    <CircularProgress size={20} />
+                    <Typography variant="body2" color="text.secondary">
+                      AI is thinking...
+                    </Typography>
                   </Box>
                 )}
+
+                <div ref={messagesEndRef} />
               </Box>
-            </Box>
-          ))}
+            </Paper>
 
-          {/* Loading indicator */}
-          {state.isLoading && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
-              <CircularProgress size={20} />
-              <Typography variant="body2" color="text.secondary">
-                AI is thinking...
-              </Typography>
-            </Box>
-          )}
+            {/* Error display */}
+            {state.error && (
+              <Alert
+                severity="error"
+                sx={{ mb: 2 }}
+                onClose={() => setState(prev => ({ ...prev, error: null }))}
+              >
+                {state.error}
+              </Alert>
+            )}
 
-          <div ref={messagesEndRef} />
-        </Box>
-      </Paper>
+            {/* Input area */}
+            <Paper sx={{ p: 2 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <TextField
+                  fullWidth
+                  multiline
+                  maxRows={4}
+                  placeholder="Ask me anything..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  disabled={state.isLoading}
+                  variant="outlined"
+                  size="small"
+                />
+                <IconButton
+                  color="primary"
+                  onClick={handleSendMessage}
+                  disabled={!inputValue.trim() || state.isLoading}
+                  sx={{ alignSelf: 'flex-end' }}
+                >
+                  <SendIcon />
+                </IconButton>
+              </Box>
+            </Paper>
+          </Box>
+        </TabPanel>
 
-      {/* Error display */}
-      {state.error && (
-        <Alert
-          severity="error"
-          sx={{ mb: 2 }}
-          onClose={() => setState(prev => ({ ...prev, error: null }))}
-        >
-          {state.error}
-        </Alert>
-      )}
-
-      {/* Input area */}
-      <Paper sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <TextField
-            fullWidth
-            multiline
-            maxRows={4}
-            placeholder="Ask me anything..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={state.isLoading}
-            variant="outlined"
-            size="small"
-          />
-          <IconButton
-            color="primary"
-            onClick={handleSendMessage}
-            disabled={!inputValue.trim() || state.isLoading}
-            sx={{ alignSelf: 'flex-end' }}
-          >
-            <SendIcon />
-          </IconButton>
-        </Box>
-      </Paper>
-    </Box>
+        {/* Process Visualization Tab */}
+        <TabPanel value={currentTab} index={1}>
+          <Box sx={{ height: 'calc(100vh - 280px)', overflow: 'auto' }}>
+            <ProcessVisualization
+              sessionId={state.sessionId}
+              enabled={visualizationEnabled}
+              onToggle={setVisualizationEnabled}
+            />
+          </Box>
+        </TabPanel>
+      </Box>
+    </Container>
   );
 };
 

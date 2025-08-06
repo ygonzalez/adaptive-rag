@@ -14,6 +14,7 @@ class GraphState(TypedDict):
         documents: list of documents
         generation_attempts: number of generation attempts
         web_search_attempts: number of web search attempts
+        session_id: session identifier for process visualization
     """
 
     question: str
@@ -22,3 +23,4 @@ class GraphState(TypedDict):
     documents: List[str]
     generation_attempts: int
     web_search_attempts: int
+    session_id: str

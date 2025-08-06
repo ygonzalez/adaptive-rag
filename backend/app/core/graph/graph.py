@@ -1,3 +1,5 @@
+import asyncio
+import time
 from dotenv import load_dotenv
 from langgraph.graph import END, StateGraph
 
@@ -10,6 +12,12 @@ from .nodes.grade_documents import grade_documents
 from .nodes.retrieve import retrieve
 from .nodes.web_search import web_search
 from .state import GraphState
+from ..visualization import (
+    emit_routing_started,
+    emit_routing_completed,
+    emit_hallucination_check,
+    emit_answer_grading
+)
 
 load_dotenv()
 
@@ -32,6 +40,15 @@ def grade_generation_grounded_in_documents_and_question(state: GraphState) -> st
     generation = state["generation"]
     generation_attempts = state.get("generation_attempts", 0)
     web_search_attempts = state.get("web_search_attempts", 0)
+    session_id = state.get("session_id", "default")
+    
+    # Create event loop if needed for async event emission
+    loop = None
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
     
     # Check if we've hit max retries
     MAX_GENERATION_ATTEMPTS = 3
@@ -41,14 +58,32 @@ def grade_generation_grounded_in_documents_and_question(state: GraphState) -> st
         print(f"---MAX GENERATION ATTEMPTS ({MAX_GENERATION_ATTEMPTS}) REACHED, ENDING---")
         return "max_retries"
     
+    start_time = time.time()
     score = hallucination_grader.invoke(
         {"documents": documents, "generation": generation}
     )
+    duration_ms = int((time.time() - start_time) * 1000)
+
+    # Emit hallucination check event
+    if loop:
+        loop.create_task(emit_hallucination_check(
+            session_id, question, str(score.binary_score).lower(), duration_ms
+        ))
 
     if hallucination_grade := score.binary_score:
         print("---DECISION: GENERATION IS GROUNDED IN DOCUMENTS---")
         print("---GRADE GENERATION vs QUESTION---")
+        
+        start_time = time.time()
         score = answer_grader.invoke({"question": question, "generation": generation})
+        duration_ms = int((time.time() - start_time) * 1000)
+        
+        # Emit answer grading event
+        if loop:
+            loop.create_task(emit_answer_grading(
+                session_id, question, str(score.binary_score).lower(), duration_ms
+            ))
+        
         if answer_grade := score.binary_score:
             print("---DECISION: GENERATION ADDRESSES QUESTION---")
             return "useful"
@@ -76,7 +111,33 @@ def route_question(state: GraphState) -> str:
 
     print("---ROUTE QUESTION---")
     question = state["question"]
+    session_id = state.get("session_id", "default")
+    
+    # Create event loop if needed for async event emission
+    loop = None
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    
+    # Emit routing started event
+    if loop:
+        loop.create_task(emit_routing_started(session_id, question))
+    
+    start_time = time.time()
     source: RouteQuery = question_router.invoke({"question": question})
+    duration_ms = int((time.time() - start_time) * 1000)
+    
+    decision = source.datasource
+    confidence = 0.85 if decision == WEBSEARCH else 0.95  # Mock confidence scores
+    reasoning = f"Question contains {'general/web' if decision == WEBSEARCH else 'AI/ML'} keywords"
+    
+    # Emit routing completed event
+    if loop:
+        loop.create_task(emit_routing_completed(
+            session_id, question, decision, confidence, reasoning, duration_ms
+        ))
 
     if source.datasource == WEBSEARCH:
         print("---ROUTE QUESTION TO WEB SEARCH---")

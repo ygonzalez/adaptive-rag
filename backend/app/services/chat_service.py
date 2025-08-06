@@ -27,7 +27,8 @@ class ChatService:
                 "web_search": False,
                 "documents": [],
                 "generation_attempts": 0,
-                "web_search_attempts": 0
+                "web_search_attempts": 0,
+                "session_id": session_id or "default"
             }
             
             # Run the graph

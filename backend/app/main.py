@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 
-from app.api.v1 import chat, documents, health
+from app.api.v1 import chat, documents, health, visualization
 from app.core.ingestion.ingestion import ensure_vectorstore_exists
 
 # Configure logging
@@ -40,6 +40,7 @@ app.add_middleware(
 app.include_router(health.router, prefix="/api/v1", tags=["health"])
 app.include_router(chat.router, prefix="/api/v1", tags=["chat"])
 app.include_router(documents.router, prefix="/api/v1", tags=["documents"])
+app.include_router(visualization.router, prefix="/api/v1", tags=["visualization"])
 
 @app.get("/")
 async def root():
