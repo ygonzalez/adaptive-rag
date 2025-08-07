@@ -143,8 +143,20 @@ def get_retriever():
 def clear_vectorstore(persist_directory: str = "./.chroma"):
     """Clear the existing vectorstore."""
     if os.path.exists(persist_directory):
-        shutil.rmtree(persist_directory)
-        logger.info(f"Cleared vectorstore at {persist_directory}")
+        try:
+            shutil.rmtree(persist_directory)
+            logger.info(f"Cleared vectorstore at {persist_directory}")
+        except OSError as e:
+            # In Docker, the directory might be mounted, so just clear contents
+            logger.warning(f"Cannot remove directory {persist_directory}: {e}")
+            logger.info("Clearing directory contents instead...")
+            for root, dirs, files in os.walk(persist_directory):
+                for file in files:
+                    try:
+                        os.remove(os.path.join(root, file))
+                    except Exception as e:
+                        logger.warning(f"Could not remove {file}: {e}")
+            logger.info("Cleared vectorstore contents")
     else:
         logger.info("No existing vectorstore to clear")
 

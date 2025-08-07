@@ -329,7 +329,7 @@ async def emit_generation_completed(
         timestamp=datetime.now(),
         question=question,
         generation_attempt=attempt,
-        generation_preview=generation_preview[:200] + "..." if len(generation_preview) > 200 else generation_preview,
+        generation_preview=generation_preview[:500] + "..." if len(generation_preview) > 500 else generation_preview,
         duration_ms=duration_ms
     )
     await process_manager.emit_event(event)

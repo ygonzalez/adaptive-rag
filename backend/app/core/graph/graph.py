@@ -59,15 +59,17 @@ def grade_generation_grounded_in_documents_and_question(state: GraphState) -> st
         return "max_retries"
     
     start_time = time.time()
+    # Format documents for hallucination checking - extract only page_content
+    formatted_docs = "\n\n---\n\n".join([doc.page_content for doc in documents])
     score = hallucination_grader.invoke(
-        {"documents": documents, "generation": generation}
+        {"documents": formatted_docs, "generation": generation}
     )
     duration_ms = int((time.time() - start_time) * 1000)
 
     # Emit hallucination check event
     if loop:
         loop.create_task(emit_hallucination_check(
-            session_id, question, str(score.binary_score).lower(), duration_ms
+            session_id, question, "yes" if score.binary_score else "no", duration_ms
         ))
 
     if hallucination_grade := score.binary_score:
@@ -81,7 +83,7 @@ def grade_generation_grounded_in_documents_and_question(state: GraphState) -> st
         # Emit answer grading event
         if loop:
             loop.create_task(emit_answer_grading(
-                session_id, question, str(score.binary_score).lower(), duration_ms
+                session_id, question, "yes" if score.binary_score else "no", duration_ms
             ))
         
         if answer_grade := score.binary_score:

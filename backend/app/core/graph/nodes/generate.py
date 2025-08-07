@@ -35,7 +35,9 @@ def generate(state: GraphState) -> Dict[str, Any]:
         loop.create_task(emit_generation_started(session_id, question, attempt))
 
     try:
-        generation = generation_chain.invoke({"context": documents, "question": question})
+        # Format documents properly - extract only page_content
+        formatted_docs = "\n\n---\n\n".join([doc.page_content for doc in documents])
+        generation = generation_chain.invoke({"context": formatted_docs, "question": question})
         
         duration_ms = int((time.time() - start_time) * 1000)
         

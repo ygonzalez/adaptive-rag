@@ -80,7 +80,7 @@ This starts:
 
 ## API Endpoints
 
-### Health Check
+### Health Checkcan 
 ```bash
 GET /api/v1/health
 ```
